@@ -1,0 +1,8 @@
+
+{
+  "project_name": "Customer Churn MLOps",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
+  "author_name": "Busuyi Johnson",
+  "description": "A reusable machine learning project structure",
+  "python_version": "3.13"
+}

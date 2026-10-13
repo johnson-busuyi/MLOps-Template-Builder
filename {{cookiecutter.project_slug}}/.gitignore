@@ -1,0 +1,25 @@
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Datasets and trained models
+data/raw/*
+data/processed/*
+models/*
+
+# Keep directories in Git
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!models/.gitkeep
