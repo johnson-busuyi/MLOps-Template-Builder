@@ -1,178 +1,173 @@
-# Automated MLOps Project Template Builder
+# MLOps Template Builder
 
-[![Cookiecutter Template CI](https://github.com/johnson-busuyi/MLOps-Template-Builder/actions/workflows/template-ci.yml/badge.svg)](https://github.com/johnson-busuyi/MLOps-Template-Builder/actions/workflows/template-ci.yml)
-
-A reusable **MLOps project scaffolding tool** built with [Cookiecutter](https://cookiecutter.readthedocs.io/). It generates a consistent machine learning project structure containing a sample model training pipeline, prediction script, FastAPI inference service, Docker configuration, automated tests, and GitHub Actions CI workflow.
+A reusable **Cookiecutter-based MLOps project generator** that scaffolds a machine-learning application with model training, inference, a FastAPI prediction API, automated tests, Docker packaging, and CI validation using **GitHub Actions** and **Azure DevOps Pipelines**.
 
 **Repository:** https://github.com/johnson-busuyi/MLOps-Template-Builder
 
-> **Project scope:** This repository is a **template generator**, not a customer-churn prediction model or a production model registry. The generated Iris classifier is a small demonstration used to verify that the scaffolding works end to end.
+## 1. Project overview
 
-## 1. Objectives
+This project addresses the repetitive setup work involved in starting machine-learning projects. Rather than manually creating directories, training scripts, API files, tests, and deployment configuration for every experiment, a developer runs Cookiecutter to generate a consistent starting point.
 
-- Automate the creation of standardized MLOps project folders and starter files.
-- Reduce repetitive setup work and promote consistent code organization.
-- Demonstrate a working train → save → predict → serve → test workflow.
-- Package a generated application in Docker.
-- Automatically validate the template on GitHub using CI.
-- Provide reproducible instructions and documentation for future ML projects.
+The generated example uses scikit-learn's Iris dataset and a **RandomForestClassifier**. The Iris model is a demonstration workload: the project's primary deliverable is the **reusable template**, not a production flower-classification system.
 
-## 2. Technology stack
+### Objectives
 
-| Technology | Role | Version / evidence |
-| --- | --- | --- |
-| Python | Runs generated ML scripts and API | **3.13.9** locally |
-| Cookiecutter | Generates project folders/files from a template | **2.7.1** locally |
-| Git | Source control | **2.43.0.windows.1** locally |
-| GitHub | Hosts the reusable template | `main` branch |
-| scikit-learn | Iris dataset, Random Forest, train/test split and evaluation | See installed requirements |
-| Joblib | Serializes and loads the trained model | See installed requirements |
-| FastAPI + Pydantic | HTTP inference API and request validation | See installed requirements |
-| Uvicorn | ASGI server for FastAPI | See installed requirements |
-| Docker | Builds and runs a containerized inference application | Verify with `docker --version` |
-| Pytest | Automated endpoint tests | **9.1.1** locally |
-| GitHub Actions | Template validation CI | Successful run #1, commit `f689e2e` |
-| Readme.so | Optional README authoring reference | https://readme.so/ |
+- Standardize the directory structure of new MLOps projects.
+- Supply a working example of training, inference, and API serving.
+- Automate validation through tests and Docker builds.
+- Validate template generation on GitHub-hosted and Azure self-hosted CI agents.
+- Provide documentation that future projects can adapt.
 
-**Dependency note:** The local test setup reported an `httpx2` dependency requirement from Starlette's test client. Before changing or pinning dependencies, check the actual environment with `python -m pip show httpx httpx2 starlette fastapi` and ensure the generated `requirements.txt` installs everything the test runner needs. Do not assume that `httpx` and `httpx2` are interchangeable.
+## 2. Architecture
 
-## 3. Architecture
+```text
+                    GitHub repository
+                  MLOps-Template-Builder
+                           |
+                 Cookiecutter template
+                           |
+             Generate sample ML project
+                           |
+            +--------------+--------------+
+            |              |              |
+         src/train.py   app/main.py   tests/test_model.py
+            |              |              |
+       Train Random    Serve model      API tests
+       Forest on Iris   via FastAPI     with Pytest
+            |              |
+       models/model.pkl ----+
+                           |
+                     Docker build
+                           |
+             Validated application image
 
-```mermaid
-flowchart TD
-    A[Developer] --> B[Cookiecutter template repository]
-    B --> C[Generate a new ML project]
-    C --> D[Project source and configuration]
-    D --> E[Train Random Forest on Iris]
-    E --> F[Save models/model.pkl]
-    F --> G[FastAPI inference service]
-    G --> H[HTTP prediction response]
-    D --> I[Pytest API tests]
-    D --> J[Docker image build]
-    B --> K[GitHub Actions template CI]
-    K --> L[Generate fresh sample project]
-    L --> M[Install, train, test, Docker build]
+       CI validation paths (independent):
+       GitHub Actions  |  Azure DevOps Pipelines
+                          CartFlow-Agent-pool
 ```
 
-### Two levels of automation
+**CI versus deployment:** Both CI pipelines generate a project, train a demonstration model, run tests, and verify a Docker image build. This is **continuous integration and build validation**, not a production deployment to Azure App Service, AKS, or another hosting environment.
 
-**Template repository CI:** `.github/workflows/template-ci.yml` at the root of this repository generates a *new* project and validates that it works. This is the workflow that GitHub runs when changes are pushed to the template repository.
+## 3. Technologies and why they are used
 
-**Generated project CI:** `{{cookiecutter.project_slug}}/.github/workflows/ci.yml` is copied into each generated project. It runs when **that generated project** is committed to its own GitHub repository. A nested workflow is not automatically run by GitHub for the parent template repository.
+| Technology | Purpose |
+|---|---|
+| Cookiecutter | Generate a consistent project structure from a reusable template |
+| Python | Implement training, prediction, and API code |
+| scikit-learn | Train the demonstration Random Forest classifier |
+| joblib | Serialize and load the trained model artifact |
+| FastAPI | Expose health and prediction HTTP endpoints |
+| Pydantic | Validate the prediction request payload |
+| Uvicorn | Run the ASGI API server |
+| Pytest | Automate API and prediction tests |
+| Docker | Package the application and dependencies as an image |
+| Git/GitHub | Source control and collaboration |
+| GitHub Actions | Validate the template on a GitHub-hosted runner |
+| Azure DevOps Pipelines | Validate the same template on a self-hosted Linux agent |
+| Readme.so | Assist in structuring project documentation |
 
-## 4. Repository layout
+### Verified environment details
+
+- Local Windows development: **Python 3.13.9**, **Git 2.43.0.windows.1**, **Cookiecutter 2.7.1**.
+- Local test output: **Pytest 9.1.1**, **Pluggy 1.6.0**, **AnyIO 4.15.1**; **3 tests passed in 15.85 seconds**.
+- Azure self-hosted agent: **Ubuntu 24.04.4 LTS**, **Python 3.12.3**, **pip 24.0**.
+- Azure agent pool: **`CartFlow-Agent-pool`**; agent name: **`johnson-busuyi-VM`**.
+- Azure agent version shown in capabilities: **5.279.0**.
+
+These versions describe observed environments; they are not necessarily pinned in `requirements.txt`. Check the repository for its current dependency constraints.
+
+## 4. Repository and generated-project structure
+
+The repository contains `cookiecutter.json` and a template directory named `{{cookiecutter.project_slug}}` (the exact rendered folder name depends on the project slug).
 
 ```text
 mlops-template/
+├── cookiecutter.json
 ├── .github/
 │   └── workflows/
-│       └── template-ci.yml       # Validates the template itself
-├── cookiecutter.json             # Prompts/defaults for new projects
-├── .gitignore
+│       └── template-ci.yml           # Validates the template repository
+├── azure-pipelines.yml               # Azure DevOps CI pipeline
 └── {{cookiecutter.project_slug}}/
-    ├── .github/
-    │   └── workflows/
-    │       └── ci.yml            # CI included in generated projects
-    ├── app/
-    │   ├── __init__.py
-    │   └── main.py               # FastAPI endpoints
-    ├── data/
-    │   ├── raw/.gitkeep
-    │   └── processed/.gitkeep
-    ├── models/.gitkeep
-    ├── notebooks/.gitkeep
-    ├── src/
-    │   ├── __init__.py
-    │   ├── train.py              # Model training and saving
-    │   └── predict.py            # Local inference
-    ├── tests/
-    │   └── test_model.py         # Endpoint tests
-    ├── .dockerignore
     ├── .gitignore
+    ├── .dockerignore
     ├── Dockerfile
     ├── README.md
-    └── requirements.txt
+    ├── requirements.txt
+    ├── .github/
+    │   └── workflows/
+    │       └── ci.yml                # CI for a generated project
+    ├── app/
+    │   ├── __init__.py
+    │   └── main.py
+    ├── src/
+    │   ├── __init__.py
+    │   ├── train.py
+    │   └── predict.py
+    ├── data/
+    │   ├── raw/
+    │   └── processed/
+    ├── models/
+    ├── notebooks/
+    └── tests/
+        └── test_model.py
 ```
 
-Empty folders are retained in Git using `.gitkeep`. The generated project's `.gitignore` excludes local environments, datasets, and trained model artifacts.
+**Important:** The repository-root `.github/workflows/template-ci.yml` tests the template itself. The nested `.github/workflows/ci.yml` is copied into projects generated from the template. GitHub only runs workflows in the root `.github/workflows/` of the repository being built.
 
-## 5. Prerequisites
+## 5. Requirements
 
-- Python 3.13 (the project was developed locally with Python 3.13.9)
+For local development:
+
+- Python 3.12+ (the Windows demo used 3.13.9; the Azure agent used 3.12.3)
 - Git
-- Docker Desktop / Docker Engine, for container builds
-- A terminal (the walkthrough used **Git Bash on Windows**)
-- A GitHub account, if publishing or running hosted CI
+- Cookiecutter
+- Docker Engine or Docker Desktop for image builds
+- Python packages listed in the generated `requirements.txt`
 
-Check your tools:
+For Azure DevOps CI:
 
-```bash
-python --version
-git --version
-docker --version
-docker info
-```
+- An accessible, authorized self-hosted agent pool
+- Linux agent with `python3`, Python `venv` support, and Docker
+- Permission for the agent service account to communicate with the Docker daemon
+- Repository connected to an Azure Pipelines definition
 
-`docker info` checks whether the Docker engine is accessible, not just whether the CLI is installed.
+## 6. Generate a project with Cookiecutter
 
-## 6. Clone and generate a project
-
-Clone the **template repository**:
+Clone the repository and create an isolated Python environment:
 
 ```bash
 git clone https://github.com/johnson-busuyi/MLOps-Template-Builder.git
 cd MLOps-Template-Builder
+python -m venv .venv
 ```
 
-Create and activate a virtual environment (Git Bash on Windows):
+On **Windows Git Bash**:
 
 ```bash
-python -m venv .venv
 source .venv/Scripts/activate
 python -m pip install cookiecutter
-cookiecutter --version
 ```
 
-Generate a project interactively:
+On **Linux/macOS**:
 
 ```bash
-cookiecutter .
+source .venv/bin/activate
+python -m pip install cookiecutter
 ```
 
-Cookiecutter reads `cookiecutter.json` and asks for values such as:
-
-```json
-{
-  "project_name": "Customer Churn MLOps",
-  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
-  "author_name": "Your Name",
-  "description": "A reusable machine learning project structure",
-  "python_version": "3.13"
-}
-```
-
-For example, enter `Iris ML Demo` as the project name and use `iris-ml-demo` as the slug. Or generate it without prompts:
+Generate a project from the current template:
 
 ```bash
 cookiecutter . --no-input project_name="Iris ML Demo" project_slug="iris-ml-demo"
 cd iris-ml-demo
-```
-
-**Note:** The local demonstration project was named `Bustop`; that name is not required by the template. The generated folder is determined by the selected `project_slug`.
-
-## 7. Install generated project dependencies
-
-From the **generated project directory**:
-
-```bash
 python -m pip install -r requirements.txt
 ```
 
-The template uses pandas, NumPy, scikit-learn, FastAPI, Uvicorn, Pytest, and Joblib. HTTP test-client dependencies must also be installed as specified by the project's verified requirements.
+Or run `cookiecutter .` interactively to answer the template's prompts. The demonstration project used during local development was named **`Bustop`**.
 
-For reproducibility in future production projects, pin or lock tested dependency versions rather than relying indefinitely on unconstrained latest releases.
+## 7. Train and evaluate the demonstration model
 
-## 8. Train and evaluate the demonstration model
+From the generated project's root:
 
 ```bash
 python -m src.train
@@ -180,63 +175,64 @@ python -m src.train
 
 The training script:
 
-1. Loads scikit-learn's built-in **Iris dataset** (150 observations).
-2. Splits the data into **80% training / 20% testing**, with `random_state=42`.
-3. Fits `RandomForestClassifier(n_estimators=100, random_state=42)`.
-4. Computes classification accuracy on the held-out split.
-5. Saves the model with Joblib to `models/model.pkl`.
+1. Loads the Iris dataset from scikit-learn.
+2. Splits it into training and testing sets (80% / 20%, random state 42).
+3. Trains `RandomForestClassifier(n_estimators=100, random_state=42)`.
+4. Calculates accuracy on the held-out test split.
+5. Saves the trained model as `models/model.pkl` using joblib.
 
-**Observed local output from the `Bustop` sample:**
+**Observed local run:**
 
 ```text
 Model Accuracy: 1.00
-Model saved to: C:\Users\user\MLOP-Project\MLOps-Template-Builder\Bustop\models\model.pkl
+Model saved to: .../models/model.pkl
 ```
 
-The saved artifact was approximately **183 KB**. The 1.00 accuracy is the observed result on this small test split, **not** a guarantee of perfect performance on new data.
+Accuracy `1.00` is the result of this particular small demonstration split, **not a guarantee of generalization or future accuracy**. For real-world MLOps, add cross-validation, data versioning, experiment tracking, monitoring, and a model approval process.
 
-Make a local prediction:
+Test inference from Python:
 
 ```bash
 python -m src.predict
 ```
 
-Observed output:
+Observed sample output:
 
 ```text
 Prediction: 0
 ```
 
-The example measurements `[5.1, 3.5, 1.4, 0.2]` produce class `0`, corresponding to **setosa**. The other Iris labels are `1 = versicolor` and `2 = virginica`.
+Iris class labels: `0 = setosa`, `1 = versicolor`, `2 = virginica`.
 
-## 9. Serve predictions with FastAPI
+## 8. Run the FastAPI application
 
-From the generated project's root, after training the model:
+Train the model first, then launch Uvicorn from the generated project's root:
 
 ```bash
+python -m src.train
 python -m uvicorn app.main:app --reload --port 8001
 ```
 
-Open the interactive API documentation:
+Open Swagger UI at **http://127.0.0.1:8001/docs**.
 
-- Swagger UI: http://127.0.0.1:8001/docs
-- OpenAPI JSON: http://127.0.0.1:8001/openapi.json
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/` | API welcome message |
+| GET | `/health` | Returns healthy if the model loaded; otherwise HTTP 503 |
+| POST | `/predict` | Validates four flower measurements and predicts the species |
 
-| Method | Route | Function |
-| --- | --- | --- |
-| GET | `/` | Returns a welcome message |
-| GET | `/health` | Returns health status or HTTP 503 if the model is not loaded |
-| POST | `/predict` | Accepts four Iris measurements and returns a class/species |
+Example POST `/predict` JSON body:
 
-Example request:
-
-```bash
-curl -X POST http://127.0.0.1:8001/predict \
-  -H 'Content-Type: application/json' \
-  -d '{"sepal_length":5.1,"sepal_width":3.5,"petal_length":1.4,"petal_width":0.2}'
+```json
+{
+  "sepal_length": 5.1,
+  "sepal_width": 3.5,
+  "petal_length": 1.4,
+  "petal_width": 0.2
+}
 ```
 
-Expected response:
+Expected demonstration response:
 
 ```json
 {
@@ -245,31 +241,25 @@ Expected response:
 }
 ```
 
-The FastAPI lifespan handler loads `models/model.pkl` once at application startup. Pydantic validates that all four measurements are positive numeric values. The `--reload` flag is for **local development only**.
+The API loads `models/model.pkl` at startup. Train the model before starting the API when running outside Docker.
 
-## 10. Docker: build and run
+## 9. Docker containerization
 
-The generated `Dockerfile` uses `python:3.13-slim`, installs dependencies, copies the project, trains the small sample model **during image build**, and starts Uvicorn on container port **8001**.
+The demonstration Dockerfile uses `python:3.13-slim`, installs project dependencies, copies the application, trains the small Iris model during the image build, and starts Uvicorn on port **8001** inside the container.
 
-Build the image from the generated project root:
+Build from the generated project's root:
 
 ```bash
 docker build -t mlops-template-api:v1 .
 ```
 
-Inspect images:
-
-```bash
-docker images
-```
-
-Run the container:
+Run it on host port **8002**:
 
 ```bash
 docker run -d --name mlops-api -p 8002:8001 mlops-template-api:v1
 ```
 
-Docker uses `-p HOST_PORT:CONTAINER_PORT`: **8002** is the port on your computer; **8001** is the port Uvicorn listens on inside the container. Port 8002 was chosen to avoid conflicts with previously used local ports 8000 (MLflow) and 8001 (local FastAPI).
+The mapping is `-p HOST_PORT:CONTAINER_PORT`: port **8002** on the host forwards to **8001** in the container. The demo used separate ports because MLflow had been accessible on `8000` and the local FastAPI instance on `8001`.
 
 Verify:
 
@@ -279,164 +269,338 @@ docker logs mlops-api
 curl http://127.0.0.1:8002/health
 ```
 
-Swagger UI in Docker: http://127.0.0.1:8002/docs
+Swagger UI: **http://127.0.0.1:8002/docs**.
 
-Stop and remove the container:
+Stop and remove the demo container when finished:
 
 ```bash
 docker stop mlops-api
 docker rm mlops-api
 ```
 
-**Production distinction:** Training during the Docker build is convenient for this Iris demo. A production pipeline should normally train, evaluate, approve, and version models separately, then package a specific model artifact for serving.
+**Production note:** Training during `docker build` is acceptable for this small demonstration, but production pipelines should generally train and evaluate separately, register/version the approved model, and package that artifact into a release image.
 
-## 11. Automated tests with Pytest
+## 10. Automated testing
 
-The generated `tests/test_model.py` checks:
-
-- `GET /` returns HTTP 200.
-- `GET /health` returns HTTP 200 and `{"status": "healthy"}`.
-- `POST /predict` returns HTTP 200 and the expected Iris prediction.
-
-Train the model before running tests, then execute from the **generated project root**:
+From the generated project's root:
 
 ```bash
-python -m src.train
 python -m pytest tests/ -v
 ```
 
-**Observed local result:**
+The three tests cover:
+
+- `test_home`: root endpoint responds successfully.
+- `test_health`: model is loaded and the health endpoint reports healthy.
+- `test_prediction`: a sample Iris input returns class `0` and species `setosa`.
+
+**Observed result:**
 
 ```text
 tests/test_model.py::test_home PASSED
 tests/test_model.py::test_health PASSED
 tests/test_model.py::test_prediction PASSED
-
 3 passed in 15.85s
 ```
 
-The observed test environment used Python **3.13.9**, Pytest **9.1.1**, Pluggy **1.6.0**, and AnyIO **4.15.1**.
+The tests depend on a compatible HTTP test client package. Confirm the actual installed dependency (`httpx` or a different package required by the installed Starlette version) and include it in the template's dependency file. Do not assume that a package name reported by an error is interchangeable with another.
 
-These are API behavior tests; they are not an exhaustive evaluation of model quality, data drift, security, or production readiness.
+## 11. GitHub Actions CI
 
-## 12. GitHub Actions CI
+**File:** `.github/workflows/template-ci.yml` at the **template repository root**.
 
-### A. Template repository workflow
+The workflow runs on pushes and pull requests (and supports manual dispatch), using an Ubuntu-hosted runner. It:
 
-File: `.github/workflows/template-ci.yml`
+1. Checks out the repository.
+2. Sets up Python 3.13 and installs Cookiecutter.
+3. Generates `iris-ml-demo` with Cookiecutter.
+4. Installs the generated project's dependencies.
+5. Trains the Iris model.
+6. Runs Pytest.
+7. Builds the Docker image.
 
-Triggers:
+**Verified:** GitHub Actions **Cookiecutter Template CI** run #1 completed successfully in **59 seconds**, at commit `f689e2e` on `main` (as shown in the project run screenshot).
+
+View the workflow runs: https://github.com/johnson-busuyi/MLOps-Template-Builder/actions
+
+## 12. Azure DevOps Pipelines CI — self-hosted agent
+
+**File:** `azure-pipelines.yml` at the template repository root.
+
+This project also validates the template through Azure DevOps using an existing self-hosted Linux agent pool:
 
 ```yaml
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
+pool:
+  name: 'CartFlow-Agent-pool'
 ```
 
-The root workflow checks out the repository, sets up Python 3.13, installs Cookiecutter, generates a fresh `iris-ml-demo` project, installs dependencies, trains the model, runs tests, and builds a Docker image.
+### Agent environment
 
-**Verified result:** GitHub Actions **Cookiecutter Template CI** run **#1** passed on the `main` branch, commit **`f689e2e`**, with a reported duration of **59 seconds**.
+| Property | Verified value |
+|---|---|
+| Pool | `CartFlow-Agent-pool` |
+| Agent | `johnson-busuyi-VM` |
+| OS | Ubuntu 24.04.4 LTS, x64 |
+| Python | 3.12.3 |
+| System pip | 24.0 |
+| Docker executable | `/usr/bin/docker` |
+| Git executable | `/usr/bin/git` |
+| Agent home | `/home/johnson-busuyi/myagent` |
 
-[View GitHub Actions runs](https://github.com/johnson-busuyi/MLOps-Template-Builder/actions)
+### Azure Pipelines YAML
 
-### B. Generated project workflow
+The following is the **working design** used to resolve Ubuntu's externally managed Python environment restriction. It assumes the agent has Python `venv` support and Docker access.
 
-File inside the template: `{{cookiecutter.project_slug}}/.github/workflows/ci.yml`
+```yaml
+name: Cookiecutter-Template-CI
 
-Once a generated project is pushed to its **own** GitHub repository, this workflow can install dependencies, train the model, and execute Pytest. It is a separate workflow from the root template validation pipeline.
+trigger:
+  branches:
+    include:
+      - main
 
-### CI versus deployment
+pr:
+  branches:
+    include:
+      - main
 
-This project implements **continuous integration and Docker image build validation**. It does **not** automatically publish the image to a container registry or deploy it to a cloud environment. Those would be separate CD steps.
+pool:
+  name: 'CartFlow-Agent-pool'
 
-## 13. Git workflow and publishing
+steps:
+  - checkout: self
+    displayName: 'Checkout Repository'
 
-The reusable template was committed and pushed to GitHub on the `main` branch:
+  - script: |
+      python3 --version
+      python3 -m venv "$(Agent.TempDirectory)/mlops-venv"
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m pip install --upgrade pip
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m pip install cookiecutter
+    displayName: 'Install Cookiecutter'
+
+  - script: |
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m cookiecutter . --no-input \
+        project_name="Iris ML Demo" \
+        project_slug="iris-ml-demo"
+    displayName: 'Generate Sample Project'
+
+  - script: |
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m pip install -r requirements.txt
+    workingDirectory: '$(Build.SourcesDirectory)/iris-ml-demo'
+    displayName: 'Install Project Dependencies'
+
+  - script: |
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m src.train
+    workingDirectory: '$(Build.SourcesDirectory)/iris-ml-demo'
+    displayName: 'Train Random Forest Model'
+
+  - script: |
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m pytest tests/ -v
+    workingDirectory: '$(Build.SourcesDirectory)/iris-ml-demo'
+    displayName: 'Run Automated Tests'
+
+  - script: |
+      docker build -t mlops-template-test:v1 ./iris-ml-demo
+    displayName: 'Verify Docker Build'
+```
+
+**Azure Repos note:** The `pr:` YAML trigger applies directly to Azure Repos Git; when the pipeline uses GitHub as its repository, configure GitHub PR validation through the Azure Pipelines GitHub integration as appropriate. The `trigger:` section enables CI on pushes to `main` when the repository connection supports YAML CI triggers.
+
+### Why use a virtual environment?
+
+Ubuntu 24.04 implements **PEP 668** for its system-managed Python installation. Installing Cookiecutter with:
+
+```bash
+python3 -m pip install cookiecutter
+```
+
+failed with `error: externally-managed-environment`.
+
+The corrected pipeline creates a dedicated environment:
+
+```bash
+python3 -m venv "$(Agent.TempDirectory)/mlops-venv"
+"$(Agent.TempDirectory)/mlops-venv/bin/python" -m pip install cookiecutter
+```
+
+This isolates the project's packages and avoids modifying the global Python environment shared with other workloads on the CartFlow agent.
+
+### Pipeline execution sequence
+
+```text
+Azure DevOps pipeline triggered
+             |
+       Checkout source
+             |
+     Create Python venv
+             |
+     Install Cookiecutter
+             |
+     Generate iris-ml-demo
+             |
+    Install project packages
+             |
+       Train Iris model
+             |
+      Run Pytest tests
+             |
+       Docker image build
+             |
+      CI pass / CI fail
+```
+
+**Outcome:** After the pool-access and Python-environment fixes, the Azure DevOps pipeline was **reported by the project owner as completing without errors**. This verifies CI execution as reported, not deployment to a running production service.
+
+## 13. Troubleshooting and resolutions
+
+### A. `cd: iris-ml-demo: No such file or directory`
+
+**Cause:** The generated project used a different slug (`Bustop`) during local development.
+
+**Fix:** Run `ls -la` in the parent directory and `cd` into the actual generated project folder. Cookiecutter uses the configured slug, not a hard-coded name.
+
+### B. MLflow appears on port 8000 instead of FastAPI
+
+**Cause:** Port 8000 was serving an existing MLflow instance.
+
+**Fix:** Start FastAPI on port 8001:
+
+```bash
+python -m uvicorn app.main:app --reload --port 8001
+```
+
+Use host port 8002 for the Docker container:
+
+```bash
+docker run -d --name mlops-api -p 8002:8001 mlops-template-api:v1
+```
+
+### C. Pytest says `file or directory not found: tests/`
+
+**Cause:** The command was run from inside `Bustop/tests`, so Pytest searched for `tests/tests`.
+
+**Fix:** Run from the generated project's root:
+
+```bash
+cd ..
+python -m pytest tests/ -v
+```
+
+### D. Pytest cannot import its HTTP test-client dependency
+
+**Cause:** The installed Starlette test client required an additional HTTP client dependency.
+
+**Fix:** Inspect the installed package versions and dependency requirements, install the correct compatible client in the virtual environment, and record it in `requirements.txt`. The local tests ultimately passed.
+
+### E. Azure DevOps cannot find or authorize the agent pool
+
+**Observed error:**
+
+```text
+Could not find a pool with name CartFlow-Agent-pool.
+The pool does not exist or has not been authorized for use.
+```
+
+**Cause:** The pool was not yet available to the new Azure DevOps project/pipeline.
+
+**Fix:** Add/share the organization-level pool with the project, grant the pipeline permission to use it, then rerun.
+
+### F. Azure pipeline: `No module named pip`
+
+**Observed initially:**
+
+```text
+/usr/bin/python3: No module named pip
+```
+
+**Investigation:** An SSH session on the agent VM later confirmed Python 3.12.3 and pip 24.0. The discrepancy was not fully isolated; the subsequent pipeline reached a different error, confirming pip was then available to the running interpreter.
+
+**Lesson:** Verify interpreter paths and package availability in the **same execution context** as the agent job before changing system packages.
+
+### G. Ubuntu: `externally-managed-environment`
+
+**Cause:** PEP 668 blocks direct system-wide pip installation in Ubuntu's managed Python environment.
+
+**Fix:** Create and use a Python virtual environment in the Azure pipeline. Avoid `--break-system-packages` for this project.
+
+### H. Docker build fails on the self-hosted agent
+
+Check Docker availability and daemon permissions:
+
+```bash
+docker --version
+docker info
+```
+
+The `docker` executable being listed in agent capabilities does not by itself prove the agent's service account can access the Docker daemon. Confirm permissions before changing the service configuration.
+
+## 14. Git commands used
+
+Initialize and commit a repository:
 
 ```bash
 git init
 git add .
 git commit -m "Initial commit: Automated MLOps Cookiecutter template"
 git branch -M main
+```
+
+Connect to GitHub (only once):
+
+```bash
 git remote add origin https://github.com/johnson-busuyi/MLOps-Template-Builder.git
 git push -u origin main
 ```
 
-The initial verified commit was `de1bee5`. A later commit, `f689e2e`, added the root template-validation CI workflow.
-
-For subsequent changes:
+Subsequent changes:
 
 ```bash
 git status
-git add .
-git commit -m "Describe your change"
+git add README.md
+git commit -m "Document GitHub Actions and Azure DevOps CI"
 git push origin main
 ```
 
-Do not re-run `git remote add origin` if the remote already exists.
+## 15. Key lessons learned
 
-## 14. Troubleshooting and fixes
+1. **Project scaffolding is a reusable engineering asset.** Cookiecutter reduces inconsistent setups and repetitive manual work.
+2. **A successful model script is not enough.** An MLOps starter should include API serving, tests, dependency management, and containerization.
+3. **CI validates repeatability.** Generating a fresh project inside CI catches template defects that a previously generated local folder may hide.
+4. **GitHub Actions and Azure DevOps have different YAML schemas.** GitHub uses `runs-on` and `uses`; Azure Pipelines uses `pool`, `checkout`, and `script`.
+5. **An Azure DevOps agent pool is not a GitHub Actions runner.** The same physical VM could host both kinds of agent if separately configured, but the pool name cannot be placed directly into GitHub Actions `runs-on`.
+6. **Agent authorization matters.** An organization-level pool must be available to and authorized for the target project/pipeline.
+7. **Use virtual environments on Ubuntu 24.04.** PEP 668 protects system Python; isolated environments make CI installs safer and more reproducible.
+8. **Port mapping matters.** `-p 8002:8001` connects the host's 8002 to the container's 8001.
+9. **CI is not CD.** Building an image successfully does not mean it has been deployed to a live application environment.
 
-| Symptom | Cause | Resolution |
-| --- | --- | --- |
-| `cd: iris-ml-demo: No such file or directory` | Project was generated with a different slug (`Bustop`) | Run `ls -la`, use the actual folder name, or generate a new project with the desired slug |
-| `cat app/main.py` prints nothing | Generated starter file was empty | Add code to the **original template**, then regenerate or copy the updated file into the existing project |
-| Browser on port 8000 shows MLflow | Another service was using port 8000 | Run FastAPI with `--port 8001`; expose the Dockerized API on host port 8002 |
-| `ERROR: file or directory not found: tests/` | Pytest was run from inside `tests/` while targeting `tests/` | `cd ..` to the generated project root and run `python -m pytest tests/ -v` |
-| Test collection fails due to missing HTTP client dependency | Starlette TestClient's required package was missing | Install the dependency requested by the actual environment, record it in the template's `requirements.txt`, and re-run tests |
-| `GET /health` returns 503 | Model file not available when FastAPI started | Run `python -m src.train`, then restart Uvicorn |
-| Docker port bind error | Requested host port already in use | Choose a free host port, e.g. `-p 9000:8001` |
-| Nested GitHub workflow does not run for template pushes | GitHub only discovers workflows at the repository root | Use `.github/workflows/template-ci.yml` in the template repository |
-| Docker container exits | Application startup or dependency error | Inspect `docker logs mlops-api` and verify model and dependencies |
+## 16. Interview-ready project explanation
 
-## 15. What this project demonstrates
+> I built a reusable MLOps project generator using Cookiecutter. It scaffolds a Python machine-learning application with a Random Forest training pipeline, serialized model artifact, FastAPI inference endpoints, Pytest tests, and Docker configuration. I configured GitHub Actions to generate and validate a fresh sample project automatically. I then added an Azure DevOps pipeline running on an existing self-hosted Ubuntu agent pool. During integration I resolved agent-pool authorization and Ubuntu's PEP 668 package-management restrictions by using an isolated Python virtual environment. The result is a repeatable CI-validated starter template that can be extended for future machine-learning workloads.
 
-- **Automation:** One template generates a standardized ML project repeatedly.
-- **Reusability:** New projects can change their names and metadata without rebuilding the folder structure.
-- **ML lifecycle basics:** Train, evaluate, serialize, load, and predict.
-- **API development:** Expose predictions through a documented HTTP interface.
-- **Containerization:** Build a portable application image and map container ports.
-- **Testing:** Validate API endpoints automatically.
-- **CI:** Test the generator itself by producing a fresh project on every push or pull request.
-- **Version control:** Track changes and publish the reusable template through GitHub.
+## 17. Potential improvements
 
-## 16. Lessons learned
+- Pin dependency versions and record a lock file for reproducible builds.
+- Add linting, formatting, static analysis, and dependency/security scanning.
+- Publish JUnit test reports to Azure DevOps and GitHub Actions.
+- Test the template with multiple supported Python versions.
+- Add data validation, experiment tracking, and model versioning.
+- Add Docker image vulnerability scanning and registry publishing.
+- Introduce a true CD stage to deploy an approved image to Azure App Service, Container Apps, or AKS.
+- Add model monitoring and retraining workflows.
+- Add a license and contributor guide if distributing the template publicly.
 
-1. **Templates and generated projects are different artifacts.** Fix reusable starter code in the template first; an already generated project does not automatically update when the template changes.
-2. **Directory context matters.** Commands such as `python -m pytest tests/ -v` assume execution from the generated project root.
-3. **Dependencies must be recorded.** Passing tests in a local environment is not sufficient if a clean CI environment cannot install the same requirements.
-4. **Host and container ports are separate.** Docker's `-p 8002:8001` maps a host port to the service inside the container.
-5. **A CI workflow must be in the right repository location.** A nested workflow is copied to generated projects, while the template's own workflow must be at its root.
-6. **A small demo can validate the complete structure.** The Iris dataset makes it possible to test training and inference without downloading a large dataset.
-7. **Green CI is meaningful evidence.** The successful GitHub Actions run demonstrated that the template could generate, train, test, and build on a clean runner.
-
-## 17. Potential future improvements
-
-- Add configurable ML task types and model algorithms instead of always using Iris/Random Forest.
-- Separate model training from the Docker image build and introduce model versioning.
-- Add dependency lockfiles, linting, type checking, and security scanning.
-- Add dataset and model validation tests, beyond basic API smoke tests.
-- Add MLflow tracking as an optional feature (not part of the current template).
-- Publish Docker images to a registry and add a deployment pipeline.
-- Improve API startup error handling and implement production readiness checks.
-
-## 18. Interview-ready project summary
-
-> I developed a reusable MLOps project scaffolding tool using Cookiecutter to standardize the setup of machine learning repositories. The generated projects include a Random Forest demonstration pipeline, FastAPI inference endpoints, Docker packaging, and automated Pytest checks. I also configured GitHub Actions to generate a fresh project, train its model, run tests, and verify a Docker build automatically. The template-validation workflow passed successfully on GitHub, demonstrating that the scaffolding works in a clean CI environment.
-
-## References
+## 18. References
 
 - [Cookiecutter documentation](https://cookiecutter.readthedocs.io/)
-- [FastAPI documentation](https://fastapi.tiangolo.com/)
-- [FastAPI lifespan events](https://fastapi.tiangolo.com/advanced/events/)
-- [scikit-learn documentation](https://scikit-learn.org/stable/)
-- [Docker documentation](https://docs.docker.com/)
-- [Pytest documentation](https://docs.pytest.org/)
-- [GitHub Actions documentation](https://docs.github.com/en/actions)
 - [Readme.so](https://readme.so/)
+- [FastAPI documentation](https://fastapi.tiangolo.com/)
+- [scikit-learn documentation](https://scikit-learn.org/stable/)
+- [Pytest documentation](https://docs.pytest.org/)
+- [Docker documentation](https://docs.docker.com/)
+- [GitHub Actions documentation](https://docs.github.com/en/actions)
+- [Azure Pipelines documentation](https://learn.microsoft.com/en-us/azure/devops/pipelines/)
+- [PEP 668](https://peps.python.org/pep-0668/)
 
 ---
 
-**Project:** Automated MLOps Project Template Builder  
-**Repository:** [johnson-busuyi/MLOps-Template-Builder](https://github.com/johnson-busuyi/MLOps-Template-Builder)
+**Status:** Cookiecutter project generation, local FastAPI testing, Docker packaging, local Pytest validation, GitHub Actions CI, and Azure DevOps CI have been exercised. Azure CI was reported successful after the virtual-environment fix; production deployment is not part of this implementation.
