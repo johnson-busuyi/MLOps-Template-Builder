@@ -1,4 +1,4 @@
-## MLOps Template Builder
+#MLOps Template Builder
 
 A reusable **Cookiecutter-based MLOps project generator** that scaffolds a machine-learning application with model training, inference, a FastAPI prediction API, automated tests, Docker packaging, and CI validation using **GitHub Actions** and **Azure DevOps Pipelines**.
 
