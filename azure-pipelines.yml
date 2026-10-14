@@ -1,0 +1,51 @@
+
+name: Cookiecutter-Template-CI
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  name: 'CartFlow-Agent-pool'
+
+steps:
+  - checkout: self
+    displayName: 'Checkout Repository'
+
+  - script: |
+      python3 --version
+      python3 -m venv "$(Agent.TempDirectory)/mlops-venv"
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m pip install --upgrade pip
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m pip install cookiecutter
+    displayName: 'Install Cookiecutter'
+
+  - script: |
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m cookiecutter . --no-input \
+        project_name="Iris ML Demo" \
+        project_slug="iris-ml-demo"
+    displayName: 'Generate Sample Project'
+
+  - script: |
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m pip install -r requirements.txt
+    workingDirectory: '$(Build.SourcesDirectory)/iris-ml-demo'
+    displayName: 'Install Project Dependencies'
+
+  - script: |
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m src.train
+    workingDirectory: '$(Build.SourcesDirectory)/iris-ml-demo'
+    displayName: 'Train Random Forest Model'
+
+  - script: |
+      "$(Agent.TempDirectory)/mlops-venv/bin/python" -m pytest tests/ -v
+    workingDirectory: '$(Build.SourcesDirectory)/iris-ml-demo'
+    displayName: 'Run Automated Tests'
+
+  - script: |
+      docker build -t mlops-template-test:v1 ./iris-ml-demo
+    displayName: 'Verify Docker Build'
